@@ -18,26 +18,27 @@ type LessonType {
 
 type Query {
   lesson(id: String!): LessonType!
-  allLesson: [LessonType!]!
+  lessons: [LessonType!]!
   student: [StudentType!]!
   studentById(id: String!): StudentType!
 }
 
 type Mutation {
-  assignLessonToStudents(AssignLessonToStudentsInput: AssignLessonToStudentsInput!): LessonType!
-  createLesson(CreateLessonInput: CreateLessonInput!): LessonType!
+  createLesson(createLessonInput: CreateLessonInput!): LessonType!
+  assignStudentsToLesson(assignStudentsToLessonInput: AssignStudentsToLessonInput!): LessonType!
   createStudent(createStudentInput: createStudentInput!): StudentType!
-}
-
-input AssignLessonToStudentsInput {
-  lessonId: ID!
-  studentsId: [ID!]!
 }
 
 input CreateLessonInput {
   name: String!
   startDate: String!
   endDate: String!
+  students: [ID!]! = []
+}
+
+input AssignStudentsToLessonInput {
+  lessonId: ID!
+  studentIds: [ID!]!
 }
 
 input createStudentInput {

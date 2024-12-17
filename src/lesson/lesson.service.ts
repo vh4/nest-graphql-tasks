@@ -7,39 +7,35 @@ import { CreateLessonInput } from './lesson.input';
 
 @Injectable()
 export class LessonService {
-    constructor(
-        @InjectRepository(Lesson) private lesson:Repository<Lesson>
-    ){}
+  constructor(
+    @InjectRepository(Lesson) private lessonRepository: Repository<Lesson>,
+  ) {}
 
-    async createLesson(CreateLessonInput:CreateLessonInput): Promise<Lesson>{
-        const {name, startDate, endDate} = CreateLessonInput;
-        const create = this.lesson.create({
-            id:uuid(),
-            name,
-            startDate,
-            endDate,
-            students:[]
-        });
+  async getLesson(id: string): Promise<Lesson> {
+    return this.lessonRepository.findOne({where:{ id }});
+  }
 
-        return await this.lesson.save(create);
-    }
+  async getLessons(): Promise<Lesson[]> {
+    return this.lessonRepository.find();
+  }
 
-    async getLesson(id: string): Promise<Lesson> {
-        return this.lesson.findOne({
-          where: { id: id },
-        });
-    }
+  async createLesson(createLessonInput: CreateLessonInput): Promise<Lesson> {
+    const { name, startDate, endDate, students } = createLessonInput;
+    
+    const lesson = this.lessonRepository.create({
+      id: uuid(),
+      name,
+      startDate,
+      endDate,
+      students
+    });
 
-    async getAllLesson():Promise<Lesson[]>{
-        return await this.lesson.find();
-    }
+    return this.lessonRepository.save(lesson);
+  }
 
-    //assign student to lesson
-    async assignStudentToLesson(lessonId:string, studentsId:string[]): Promise<Lesson>{
-        const lessons = await this.lesson.findOne({where:{id:lessonId}});
-        console.log([...lessons.students, ...studentsId]);
-        lessons.students =  [...lessons.students, ...studentsId];
-        return await this.lesson.save(lessons);
-    }
-      
+  async assignStudentsToLesson(lessonId: string, studentIds: string[]): Promise<Lesson> {
+    const lesson = await this.lessonRepository.findOne({where:{ id: lessonId }});
+    lesson.students = [...lesson.students, ...studentIds];
+    return this.lessonRepository.save(lesson);
+  }
 }
